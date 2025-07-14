@@ -159,6 +159,9 @@ export const signUp = async (formData: FormData): Promise<ActionResponse> => {
   }
 }
 
+
+// it's essencially route handler for sign out access to all server features and cookies etc 
+
 export const signOut = async (): Promise<ActionResponse> => {
   try {
     // Delete the session
