@@ -5,7 +5,6 @@ import { issues } from '@/db/schema'
 import { eq } from 'drizzle-orm'
 import { getCurrentUser } from '@/lib/dal'
 import { z } from 'zod'
-import { mockDelay } from '@/lib/utils'
 
 // Define Zod schema for issue validation
 const IssueSchema = z.object({
@@ -34,3 +33,48 @@ export type ActionResponse = {
   errors?: Record<string, string[]>
   error?: string
 }
+
+export async function createIssue(data: IssueData): Promise<ActionResponse> {
+  try {
+    // Security check - ensure user is authenticated
+    const user = await getCurrentUser()
+    if (!user) {
+      return {
+        success: false,
+        message: 'Unauthorized access',
+        error: 'Unauthorized',
+      }
+    }
+
+    // Validate with Zod
+    const validationResult = IssueSchema.safeParse(data)
+    if (!validationResult.success) {
+      return {
+        success: false,
+        message: 'Validation failed',
+        errors: validationResult.error.flatten().fieldErrors,
+      }
+    }
+
+    // Create issue with validated data
+    const validatedData = validationResult.data
+    await db.insert(issues).values({
+      title: validatedData.title,
+      description: validatedData.description || null,
+      status: validatedData.status,
+      priority: validatedData.priority,
+      userId: validatedData.userId,
+    })
+
+    return { success: true, message: 'Issue created successfully' }
+  } catch (error) {
+    console.error('Error creating issue:', error)
+    return {
+      success: false,
+      message: 'An error occurred while creating the issue',
+      error: 'Failed to create issue',
+    }
+  }
+}
+
+export async function updateIssue() {}
