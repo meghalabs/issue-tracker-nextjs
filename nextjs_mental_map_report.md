@@ -156,4 +156,85 @@ export async function POST(req: Request) { ... }
 
 ---
 
-Let me know if you want this extended with architecture diagrams or real code snippets.
+
+
+
+---
+
+## 11. 🌐 Domains, DNS, Proxies & Serverless Compute
+
+### 🔸 Domains
+
+**What**: Human-readable names like `meghalabs.dev` that map to your deployed app.
+
+**In Vercel**:
+- Easily manage custom domains via the dashboard
+- SSL is auto-configured (HTTPS)
+- Preview deployments get unique subdomains
+
+---
+
+### 🔸 DNS (Domain Name System)
+
+**What**: Translates domain names to IP addresses to locate your site on the internet.
+
+**In Vercel**:
+- Vercel can host DNS or connect to external providers
+- Supports A, CNAME, TXT, etc. records
+- Example: `CNAME www ➝ cname.vercel-dns.com`
+
+---
+
+### 🔸 Proxies
+
+**What**: Intermediaries that intercept requests and responses.
+
+**In Vercel**:
+- Middleware behaves like a reverse proxy
+- Used for auth, locale redirects, A/B testing
+
+**Example**:
+```ts
+// middleware.ts
+if (!auth) return NextResponse.redirect("/login")
+```
+
+---
+
+### 🔸 Serverless Compute
+
+**What**: Executes your backend logic without provisioning or managing servers.
+
+**In Vercel**:
+- API Routes, Server Actions, RSCs = Serverless or Edge
+- Auto-scaling, per-invocation billing
+
+**Types**:
+| Type          | Runtime     | Location        | Use Cases                |
+|---------------|-------------|------------------|---------------------------|
+| Serverless    | `nodejs`    | Centralized DCs  | DB calls, API routes     |
+| Edge Function | `edge`      | Global POPs      | Auth, geolocation, SSR   |
+
+---
+
+### 🧠 Where These Fit Architecturally
+
+```plaintext
+USER REQUEST
+    ↓
+🌍 Domain (meghalabs.dev)
+    ↓
+📘 DNS resolves to Vercel Edge Network
+    ↓
+🔁 Middleware.ts (Edge Function Proxy)
+    ↓
+📄 RSC / Route.tsx / API / Server Actions
+    ↓
+📦 Serverless Function (Node.js runtime)
+    ↓
+🗃️ DB, Edge Config, External API
+```
+
+
+
+
